@@ -82,7 +82,7 @@ class PokerSocket(object):
 
         self.number_players = len(players)
         self.my_Call_Bet = data['self']['minBet']
-        self.my_Raise_Bet = int(data['self']['minBet'])*2
+        self.my_Raise_Bet = int(data['self']['minBet']) * 2
         self.hole = []
         for card in (hands):
             self.hole.append(getCard(card))
@@ -132,7 +132,7 @@ class PokerSocket(object):
             boards = data['game']['board']
             self.board = []
             for card in (boards):
-               self.board.append(getCard(card))
+                self.board.append(getCard(card))
             action, amount = self.getAction(data)
             print "action: {}".format(action)
             print "action amount: {}".format(amount)
@@ -265,82 +265,51 @@ class PotOddsPokerBot(PokerBot):
         print "Round:{}".format(round)
         score = HandEvaluator.evaluate_hand(hole, board)
         print "score:{}".format(score)
-        print "score:{}".format(score)
-
         if my_Call_Bet == 0:
             print 'BB, call'
             action = 'call'
             amount = my_Call_Bet
         elif round == 'preflop' or round == 'Deal':
-            if score >= self.preflop_tight_loose_threshold:
-                TableOdds = (my_Raise_Bet + total_bet) / float(my_Raise_Bet + Table_Bet)
-                print "decide raise score >= %s=(%s+%s)/(%s+%s)" % (
-                    TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
-                if score >= TableOdds:
-                    action = 'raise'
-                    amount = my_Raise_Bet
-                else:
-                    TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
-                    print "decide call score >= %s=(%s+%s)/(%s+%s)" % (
-                        TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
-
-                    if score >= TableOdds:
-                        action = 'call'
-                        amount = my_Call_Bet
-                    else:
-                        action = 'fold'
-                        amount = 0
+            if my_Call_Bet > my_Chips:
+                my_Call_Bet = my_Chips
+            ChipOdds = 0.94 * ((my_Call_Bet + total_bet) / float(my_Chips + total_bet)) ** 0.5
+            if score >= ChipOdds * 2 and score >=0.9:
+                action = 'raise'
+                amount = my_Raise_Bet
+            elif score >= ChipOdds and score >= self.preflop_tight_loose_threshold or score >=0.8:
+                action = 'call'
+                amount = my_Call_Bet
             else:
-                TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
-                print "decide call score %s=(%s+%s)/(%s+%s)" % (
-                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
-                if score >= TableOdds:
-                    action = 'call'
-                    amount = my_Call_Bet
-                else:
-                    action = 'fold'
-                    amount = 0
+                action = 'fold'
+                amount = 0
+            print "chipodds %s=((%s+%s) /(%s+%s))**0.5" % (ChipOdds, my_Call_Bet, total_bet, my_Chips, total_bet)
         else:
-            if score >= self.aggresive_passive_threshold:
-                TableOdds = (my_Raise_Bet + total_bet) / float(my_Raise_Bet + Table_Bet)
-                print "decide raise score >= %s=(%s+%s)/(%s+%s)" % (
-                    TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
-                if score >= 0.93:
-                    action = 'allin'
-                    amount = 0
-                elif score >= TableOdds:
-                    action = 'raise'
-                    amount = my_Raise_Bet
-                else:
-                    TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
-                    print "decide call score >= %s=(%s+%s)/(%s+%s)" % (
-                        TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
-                    if score >= TableOdds:
-                        action = 'call'
-                        amount = my_Call_Bet
-                    else:
-                        action = 'fold'
-                        amount = 0
+            if my_Call_Bet > my_Chips:
+                my_Call_Bet = my_Chips
+            ChipOdds = 0.94 * ((my_Call_Bet + total_bet) / float(my_Chips + total_bet)) ** 0.5
+            if score >= 0.94:
+                action = 'allin'
+                amount = 0
+            elif score >= ChipOdds * 2 and score >= self.aggresive_passive_threshold or score >= 0.9:
+                action = 'raise'
+                amount = my_Raise_Bet
+            elif score >= ChipOdds and score >= self.aggresive_passive_threshold or score >= 0.85:
+                action = 'call'
+                amount = my_Call_Bet
             else:
-                TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
-                print "decide call score %s=(%s+%s)/(%s+%s)" % (
-                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
-                if score >= TableOdds:
-                    action = 'call'
-                    amount = my_Call_Bet
-                else:
-                    action = 'fold'
-                    amount = 0
-        if (action == 'call' or action == 'raise') and len(board) >= 4 and score <= 0.8:
-            simulation_number = 40
+                action = 'fold'
+                amount = 0
+            print "chipodds %s=((%s+%s)/(%s+%s))**0.5" % (ChipOdds, my_Call_Bet, total_bet, my_Chips, total_bet)
+        if (action == 'call' or action == 'raise') and len(board) >= 4 and score <= 0.69:
+            simulation_number = 50
             win_rate = self.get_win_prob(hole, board, simulation_number, number_players)
             if win_rate < 0.25:
                 action = 'fold'
                 amount = 0
-            elif win_rate < 0.5:
+            elif win_rate < 0.35:
                 action = 'call'
                 amount = my_Call_Bet
-            elif win_rate < 0.7:
+            elif win_rate < 0.45:
                 action = 'raise'
                 amount = my_Raise_Bet
             else:
@@ -351,15 +320,14 @@ class PotOddsPokerBot(PokerBot):
 
 
 if __name__ == '__main__':
-    aggresive_threshold = 0.5
+    aggresive_threshold = 0.54
     passive_threshold = 0.7
     preflop_threshold_Loose = 0.2
     preflop_threshold_Tight = 0.5
 
     playerName = "KIHo"
-    connect_url = "ws://poker-dev.wrs.club:3001/"
-    # connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
-    simulation_number = 25
+    # connect_url = "ws://poker-dev.wrs.club:3001/"
+    connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
     myPokerBot = PotOddsPokerBot(preflop_threshold_Loose, aggresive_threshold)
     myPokerSocket = PokerSocket(playerName, connect_url, myPokerBot)
     myPokerSocket.doListen()
