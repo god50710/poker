@@ -337,7 +337,13 @@ class PotOddsPokerBot(PokerBot):
             if win_rate < 0.25:
                 action = 'fold'
                 amount = 0
-            elif win_rate > 0.7:
+            elif win_rate < 0.5:
+                action = 'call'
+                amount = my_Call_Bet
+            elif win_rate < 0.7:
+                action = 'raise'
+                amount = my_Raise_Bet
+            else:
                 action = 'allin'
                 amount = 0
             print 'change'
