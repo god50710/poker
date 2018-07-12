@@ -219,16 +219,16 @@ class PotOddsPokerBot(PokerBot):
                 rank = 14
             else:
                 rank = int(cardID)
-        print "rank", rank, "suit", suit
+        # print "rank", rank, "suit", suit
         return Card(rank, suit)
 
     def _pick_unused_card(self, card_num, used_card):
         used = [self.getCardID(card) for card in used_card]
-        print "used", used
+        # print "used", used
         unused = [card_id for card_id in range(1, 53) if card_id not in used]
-        print "unused", unused
+        # print "unused", unused
         choiced = random.sample(unused, card_num)
-        print "choiced", choiced
+        # print "choiced", choiced
         return [self.genCardFromId(card_id) for card_id in choiced]
 
     def get_win_prob(self, hand_cards, board_cards, simulation_number, num_players):
@@ -239,17 +239,17 @@ class PotOddsPokerBot(PokerBot):
 
             board_cards_to_draw = 5 - len(board_cards)  # 2
             board_sample = board_cards + self._pick_unused_card(board_cards_to_draw, board_cards + hand_cards)
-            print "board_sample", board_sample
+            # print "board_sample", board_sample
             unused_cards = self._pick_unused_card((num_players - 1) * 2, hand_cards + board_sample)
-            print "unused_cards", unused_cards
+            # print "unused_cards", unused_cards
             opponents_hole = [unused_cards[2 * i:2 * i + 2] for i in range(num_players - 1)]
-            print "opponents_hole", opponents_hole
+            # print "opponents_hole", opponents_hole
             opponents_score = [pow(evaluator.evaluate_hand(hole, board_sample), num_players) for hole in
                                opponents_hole]
-            print "opponents_score", opponents_score
+            # print "opponents_score", opponents_score
             # hand_sample = self._pick_unused_card(2, board_sample + hand_cards)
             my_rank = pow(evaluator.evaluate_hand(hand_cards, board_sample), num_players)
-            print "my_rank", my_rank
+            # print "my_rank", my_rank
             if my_rank >= max(opponents_score):
                 win += 1
             # rival_rank = evaluator.evaluate_hand(hand_sample, board_sample)
@@ -265,7 +265,8 @@ class PotOddsPokerBot(PokerBot):
         # Aggresive -tight
         self.number_players = number_players
 
-        my_Raise_Bet = (my_Chips * self.bet_tolerance) / (1 - self.bet_tolerance)
+        my_Raise_Bet = (my_Chips * self.bet_tolerance) / float(1 - self.bet_tolerance)
+        print "my_Chips", my_Chips, "my_Raise_Bet", my_Raise_Bet, "Table_Bet", Table_Bet
         print "Round:{}".format(round)
         score = HandEvaluator.evaluate_hand(hole, board)
         print "score:{}".format(score)
@@ -274,19 +275,20 @@ class PotOddsPokerBot(PokerBot):
 
         if round == 'preflop':
             if score >= self.preflop_tight_loose_threshold:
-                action = 'call'
-                amount = my_Call_Bet
-            else:
-                action = 'fold'
-                amount = 0
-        else:
-            if score >= self.aggresive_passive_threshold:
-                TableOdds = (my_Raise_Bet + total_bet) / (my_Raise_Bet + Table_Bet)
-                if score >= TableOdds:
+                TableOdds = (my_Raise_Bet + total_bet) / float(my_Raise_Bet + Table_Bet)
+                print "decide raise score >= %s=(%s+%s)/(%s+%s)" % (
+                TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
+                if score >= 0.93:
+                    action = 'allin'
+                    amount = my_Chips
+                elif score >= TableOdds:
                     action = 'raise'
                     amount = my_Raise_Bet
                 else:
-                    TableOdds = (my_Call_Bet + total_bet) / (my_Call_Bet + Table_Bet)
+                    TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
+                    print "decide call score >= %s=(%s+%s)/(%s+%s)" % (
+                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
+
                     if score >= TableOdds:
                         action = 'call'
                         amount = my_Call_Bet
@@ -294,19 +296,56 @@ class PotOddsPokerBot(PokerBot):
                         action = 'fold'
                         amount = 0
             else:
-                TableOdds = (my_Call_Bet + total_bet) / (my_Call_Bet + Table_Bet)
+                TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
+                print "decide call score %s=(%s+%s)/(%s+%s)" % (
+                TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
                 if score >= TableOdds:
                     action = 'call'
                     amount = my_Call_Bet
                 else:
                     action = 'fold'
                     amount = 0
-        if (action == 'call' or action == 'raise') and len(board) >= 3:
-            simulation_number = 100
+        else:
+            if score >= self.aggresive_passive_threshold:
+                TableOdds = (my_Raise_Bet + total_bet) / float(my_Raise_Bet + Table_Bet)
+                print "decide raise score >= %s=(%s+%s)/(%s+%s)" % (
+                TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
+                if score >= 0.93:
+                    action = 'allin'
+                    amount = my_Chips
+                elif score >= TableOdds:
+                    action = 'raise'
+                    amount = my_Raise_Bet
+                else:
+                    TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
+                    print "decide call score >= %s=(%s+%s)/(%s+%s)" % (
+                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
+
+                    if score >= TableOdds:
+                        action = 'call'
+                        amount = my_Call_Bet
+                    else:
+                        action = 'fold'
+                        amount = 0
+            else:
+                TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
+                print "decide call score %s=(%s+%s)/(%s+%s)" % (
+                TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
+                if score >= TableOdds:
+                    action = 'call'
+                    amount = my_Call_Bet
+                else:
+                    action = 'fold'
+                    amount = 0
+        if (action == 'call' or action == 'raise') and len(board) >= 4:
+            simulation_number = 35
             win_rate = self.get_win_prob(hole, board, simulation_number, number_players)
-            if win_rate < 0.4:
+            if win_rate < 0.3:
                 action = 'fold'
                 amount = 0
+            elif win_rate > 0.8:
+                action = 'allin'
+                amount = my_Chips
             print 'change'
         return action, amount
 
@@ -438,7 +477,7 @@ class FreshPokerBot(PokerBot):
 if __name__ == '__main__':
     aggresive_threshold = 0.5
     passive_threshold = 0.7
-    preflop_threshold_Loose = 0.3
+    preflop_threshold_Loose = 0.2
     preflop_threshold_Tight = 0.5
 
     # Aggresive -loose
@@ -448,7 +487,8 @@ if __name__ == '__main__':
     # myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,passive_threshold,bet_tolerance)
 
     playerName = "eric01"
-    connect_url = "ws://poker-dev.wrs.club:3001/"
+    # connect_url = "ws://poker-dev.wrs.club:3001/"
+    connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
     # connect_url = "ws://localhost:8080/"
     simulation_number = 25
     bet_tolerance = 0.1
