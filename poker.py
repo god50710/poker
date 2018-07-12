@@ -71,7 +71,6 @@ class PokerSocket(object):
 
     def getAction(self, data):
         round = data['game']['roundName']
-        # time.sleep(2)
         players = data['game']['players']
         chips = data['self']['chips']
         hands = data['self']['cards']
@@ -98,9 +97,6 @@ class PokerSocket(object):
             round = 'preflop'
 
         print "round:{}".format(round)
-
-        # aggresive_Tight = PokerBotPlayer(preflop_threshold_Tight, aggresive_threshold)
-        # tightAction, tightAmount = aggresive_Tight.declareAction(hole, board, round, my_Raise_Bet, my_Call_Bet,Table_Bet,number_players)
         action, amount = self.pokerbot.declareAction(self.hole, self.board, round, self.my_Raise_Bet, self.my_Call_Bet,
                                                      self.Table_Bet, self.number_players, self.raise_count,
                                                      self.bet_count, self.my_Chips, self.total_bet)
@@ -133,10 +129,13 @@ class PokerSocket(object):
                     "amount": amount
                 }}))
         elif action == "__action":
+            boards = data['game']['board']
+            self.board = []
+            for card in (boards):
+               self.board.append(getCard(card))
             action, amount = self.getAction(data)
             print "action: {}".format(action)
             print "action amount: {}".format(amount)
-
             self.ws.send(json.dumps({
                 "eventName": "__action",
                 "data": {
@@ -187,10 +186,9 @@ class PokerSocket(object):
 
 class PotOddsPokerBot(PokerBot):
 
-    def __init__(self, preflop_tight_loose_threshold, aggresive_passive_threshold, bet_tolerance):
+    def __init__(self, preflop_tight_loose_threshold, aggresive_passive_threshold):
         self.preflop_tight_loose_threshold = preflop_tight_loose_threshold
         self.aggresive_passive_threshold = aggresive_passive_threshold
-        self.bet_tolerance = bet_tolerance
 
     def game_over(self, isWin, winChips, data):
         print "Game Over"
@@ -267,10 +265,10 @@ class PotOddsPokerBot(PokerBot):
         print "Round:{}".format(round)
         score = HandEvaluator.evaluate_hand(hole, board)
         print "score:{}".format(score)
-        # score = math.pow(score, self.number_players)
         print "score:{}".format(score)
 
         if my_Call_Bet == 0:
+            print 'BB, call'
             action = 'call'
             amount = my_Call_Bet
         elif round == 'preflop' or round == 'Deal':
@@ -352,20 +350,10 @@ if __name__ == '__main__':
     preflop_threshold_Loose = 0.2
     preflop_threshold_Tight = 0.5
 
-    # Aggresive -loose
-    # myPokerBot=PotOddsPokerBot(preflop_threshold_Loose,aggresive_threshold,bet_tolerance)
-    # myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,aggresive_threshold,bet_tolerance)
-    # myPokerBot=PotOddsPokerBot(preflop_threshold_Loose,passive_threshold,bet_tolerance)
-    # myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,passive_threshold,bet_tolerance)
-
     playerName = "KIHo"
     connect_url = "ws://poker-dev.wrs.club:3001/"
     # connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
-    # connect_url = "ws://localhost:8080/"
     simulation_number = 25
-    bet_tolerance = 0.1
-    # myPokerBot = FreshPokerBot()
-    # myPokerBot = MontecarloPokerBot(simulation_number)
-    myPokerBot = PotOddsPokerBot(preflop_threshold_Loose, aggresive_threshold, bet_tolerance)
+    myPokerBot = PotOddsPokerBot(preflop_threshold_Loose, aggresive_threshold)
     myPokerSocket = PokerSocket(playerName, connect_url, myPokerBot)
     myPokerSocket.doListen()
