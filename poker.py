@@ -83,7 +83,7 @@ class PokerSocket(object):
 
         self.number_players = len(players)
         self.my_Call_Bet = data['self']['minBet']
-        self.my_Raise_Bet = int(chips / 4)
+        self.my_Raise_Bet = int(data['self']['minBet'])*2
         self.hole = []
         for card in (hands):
             self.hole.append(getCard(card))
@@ -262,32 +262,29 @@ class PotOddsPokerBot(PokerBot):
 
     def declareAction(self, hole, board, round, my_Raise_Bet, my_Call_Bet, Table_Bet, number_players, raise_count,
                       bet_count, my_Chips, total_bet):
-        # Aggresive -tight
-        self.number_players = number_players
 
-        my_Raise_Bet = (my_Chips * self.bet_tolerance) / float(1 - self.bet_tolerance)
-        print "my_Chips", my_Chips, "my_Raise_Bet", my_Raise_Bet, "Table_Bet", Table_Bet
+        print "my_Chips", my_Chips, "my_Call_Bet", my_Call_Bet, "my_Raise_Bet", my_Raise_Bet, "Table_Bet", Table_Bet
         print "Round:{}".format(round)
         score = HandEvaluator.evaluate_hand(hole, board)
         print "score:{}".format(score)
         # score = math.pow(score, self.number_players)
         print "score:{}".format(score)
 
-        if round == 'preflop':
+        if my_Call_Bet == 0:
+            action = 'call'
+            amount = my_Call_Bet
+        elif round == 'preflop' or round == 'Deal':
             if score >= self.preflop_tight_loose_threshold:
                 TableOdds = (my_Raise_Bet + total_bet) / float(my_Raise_Bet + Table_Bet)
                 print "decide raise score >= %s=(%s+%s)/(%s+%s)" % (
-                TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
-                if score >= 0.93:
-                    action = 'allin'
-                    amount = my_Chips
-                elif score >= TableOdds:
+                    TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
+                if score >= TableOdds:
                     action = 'raise'
                     amount = my_Raise_Bet
                 else:
                     TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
                     print "decide call score >= %s=(%s+%s)/(%s+%s)" % (
-                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
+                        TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
 
                     if score >= TableOdds:
                         action = 'call'
@@ -298,7 +295,7 @@ class PotOddsPokerBot(PokerBot):
             else:
                 TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
                 print "decide call score %s=(%s+%s)/(%s+%s)" % (
-                TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
+                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
                 if score >= TableOdds:
                     action = 'call'
                     amount = my_Call_Bet
@@ -309,18 +306,17 @@ class PotOddsPokerBot(PokerBot):
             if score >= self.aggresive_passive_threshold:
                 TableOdds = (my_Raise_Bet + total_bet) / float(my_Raise_Bet + Table_Bet)
                 print "decide raise score >= %s=(%s+%s)/(%s+%s)" % (
-                TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
+                    TableOdds, my_Raise_Bet, total_bet, my_Raise_Bet, Table_Bet)
                 if score >= 0.93:
                     action = 'allin'
-                    amount = my_Chips
+                    amount = 0
                 elif score >= TableOdds:
                     action = 'raise'
                     amount = my_Raise_Bet
                 else:
                     TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
                     print "decide call score >= %s=(%s+%s)/(%s+%s)" % (
-                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
-
+                        TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
                     if score >= TableOdds:
                         action = 'call'
                         amount = my_Call_Bet
@@ -330,147 +326,23 @@ class PotOddsPokerBot(PokerBot):
             else:
                 TableOdds = (my_Call_Bet + total_bet) / float(my_Call_Bet + Table_Bet)
                 print "decide call score %s=(%s+%s)/(%s+%s)" % (
-                TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
+                    TableOdds, my_Call_Bet, total_bet, my_Call_Bet, Table_Bet)
                 if score >= TableOdds:
                     action = 'call'
                     amount = my_Call_Bet
                 else:
                     action = 'fold'
                     amount = 0
-        if (action == 'call' or action == 'raise') and len(board) >= 4:
-            simulation_number = 35
+        if (action == 'call' or action == 'raise') and len(board) >= 4 and score <= 0.8:
+            simulation_number = 40
             win_rate = self.get_win_prob(hole, board, simulation_number, number_players)
-            if win_rate < 0.3:
+            if win_rate < 0.25:
                 action = 'fold'
                 amount = 0
-            elif win_rate > 0.8:
+            elif win_rate > 0.7:
                 action = 'allin'
-                amount = my_Chips
+                amount = 0
             print 'change'
-        return action, amount
-
-
-class MontecarloPokerBot(PokerBot):
-
-    def __init__(self, simulation_number):
-        self.simulation_number = simulation_number
-
-    def game_over(self, isWin, winChips, data):
-        pass
-
-    def declareAction(self, hole, board, round, my_Raise_Bet, my_Call_Bet, Table_Bet, number_players, raise_count,
-                      bet_count, my_Chips, total_bet):
-        win_rate = self.get_win_prob(hole, board, number_players)
-        print "win Rate:{}".format(win_rate)
-        if win_rate > 0.5:
-            if win_rate > 0.85:
-                # If it is extremely likely to win, then raise as much as possible
-                action = 'raise'
-                amount = my_Raise_Bet
-            elif win_rate > 0.75:
-                # If it is likely to win, then raise by the minimum amount possible
-                action = 'raise'
-                amount = my_Raise_Bet
-            else:
-                # If there is a chance to win, then call
-                action = 'call'
-                amount = my_Call_Bet
-        else:
-            action = 'fold'
-            amount = 0
-        return action, amount
-
-    def getCardID(self, card):
-        rank = card.rank
-        suit = card.suit
-        suit = suit - 1
-        id = (suit * 13) + rank
-        return id
-
-    def genCardFromId(self, cardID):
-        if int(cardID) > 13:
-            rank = int(cardID) % 13
-            if rank == 0:
-                suit = int((int(cardID) - rank) / 13)
-            else:
-                suit = int((int(cardID) - rank) / 13) + 1
-
-            if (rank == 0):
-                rank = 14
-            else:
-                rank += 1
-            return Card(rank, suit)
-        else:
-            suit = 1
-            rank = int(cardID)
-            if (rank == 0):
-                rank = 14
-            else:
-                rank += 1
-            return Card(rank, suit)
-
-    def _pick_unused_card(self, card_num, used_card):
-
-        used = [self.getCardID(card) for card in used_card]
-        unused = [card_id for card_id in range(1, 53) if card_id not in used]
-        choiced = random.sample(unused, card_num)
-        return [self.genCardFromId(card_id) for card_id in choiced]
-
-    def get_win_prob(self, hand_cards, board_cards, num_players):
-        """Calculate the win probability from your board cards and hand cards by using simple Monte Carlo method.
-
-        Args:
-            board_cards: The board card list.
-            hand_cards: The hand card list
-
-        Examples:
-            >>> get_win_prob(["8H", "TS", "6C"], ["7D", "JC"])
-        """
-        win = 0
-        round = 0
-        evaluator = HandEvaluator()
-
-        for i in range(self.simulation_number):
-
-            board_cards_to_draw = 5 - len(board_cards)  # 2
-            board_sample = board_cards + self._pick_unused_card(board_cards_to_draw, board_cards + hand_cards)
-
-            unused_cards = self._pick_unused_card((num_players - 1) * 2, hand_cards + board_sample)
-            opponents_hole = [unused_cards[2 * i:2 * i + 2] for i in range(num_players - 1)]
-            # hand_sample = self._pick_unused_card(2, board_sample + hand_cards)
-
-            try:
-                opponents_score = [evaluator.evaluate_hand(hole, board_sample) for hole in opponents_hole]
-                my_rank = evaluator.evaluate_hand(hand_cards, board_sample)
-                if my_rank >= max(opponents_score):
-                    win += 1
-                # rival_rank = evaluator.evaluate_hand(hand_sample, board_sample)
-                round += 1
-            except Exception, e:
-                # print e.message
-                continue
-        print "Win:{}".format(win)
-        win_prob = win / float(round)
-        return win_prob
-
-
-class FreshPokerBot(PokerBot):
-
-    def game_over(self, isWin, winChips, data):
-        pass
-
-    def declareAction(self, holes, boards, round, my_Raise_Bet, my_Call_Bet, Table_Bet, number_players, raise_count,
-                      bet_count, my_Chips, total_bet):
-        my_rank = HandEvaluator.evaluate_hand(holes, boards)
-        if my_rank > 0.9:
-            action = 'raise'
-            amount = my_Raise_Bet
-        elif my_rank > 0.7:
-            action = 'call'
-            amount = my_Call_Bet
-        else:
-            action = 'fold'
-            amount = 0
         return action, amount
 
 
@@ -486,9 +358,9 @@ if __name__ == '__main__':
     # myPokerBot=PotOddsPokerBot(preflop_threshold_Loose,passive_threshold,bet_tolerance)
     # myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,passive_threshold,bet_tolerance)
 
-    playerName = "eric01"
-    # connect_url = "ws://poker-dev.wrs.club:3001/"
-    connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
+    playerName = "KIHo"
+    connect_url = "ws://poker-dev.wrs.club:3001/"
+    # connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
     # connect_url = "ws://localhost:8080/"
     simulation_number = 25
     bet_tolerance = 0.1
