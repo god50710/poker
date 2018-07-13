@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5260f26-37b3-4a4f-b4c3-4e9aa983dede" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/poker.py" beforeDir="false" afterPath="$PROJECT_DIR$/poker.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,15 +17,18 @@
       <file leaf-file-name="poker.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/poker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="266" column="27" lean-forward="true" selection-start-line="266" selection-start-column="27" selection-end-line="266" selection-end-column="27" />
+            <state relative-caret-position="347">
+              <caret line="343" column="64" lean-forward="true" selection-start-line="343" selection-start-column="64" selection-end-line="343" selection-end-column="64" />
               <folding>
                 <element signature="e#15#46#0" expanded="true" />
+                <element signature="e#257#890#0" />
                 <element signature="e#921#1330#0" />
+                <element signature="e#6320#6457#0" />
                 <element signature="e#6616#6633#0" />
                 <element signature="e#6674#6856#0" />
                 <element signature="e#6903#7333#0" />
                 <element signature="e#7397#7741#0" />
+                <element signature="e#7836#9243#0" />
               </folding>
             </state>
           </provider>
@@ -69,6 +73,8 @@
       <find>bb, call</find>
       <find>score</find>
       <find>print</find>
+      <find>hands</find>
+      <find>number_players</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -77,13 +83,14 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/game_data/utils.py" />
         <option value="$PROJECT_DIR$/poker.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1870" />
-    <option name="y" value="10" />
+    <option name="x" value="-1522" />
+    <option name="y" value="50" />
     <option name="width" value="1918" />
     <option name="height" value="1038" />
   </component>
@@ -101,6 +108,10 @@
               <item name="poker" type="b2602c69:ProjectViewProjectNode" />
               <item name="poker" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="poker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -108,8 +119,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -162,18 +174,18 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1870" y="10" width="1918" height="1038" extended-state="0" />
+    <frame x="-1522" y="50" width="1918" height="1038" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.07518402" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5005952" side_tool="true" weight="0.38157895" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49940476" visible="true" weight="0.24377032" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49940476" visible="true" weight="0.37378114" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.5430393" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.5423038" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -192,16 +204,11 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/poker.py</url>
-          <line>4</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/poker.py</url>
           <line>42</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="3" />
+      <option name="time" value="5" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -211,11 +218,14 @@
           <caret line="336" column="32" lean-forward="true" selection-start-line="336" selection-start-column="32" selection-end-line="336" selection-end-column="32" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#257#890#0" />
             <element signature="e#921#1330#0" />
+            <element signature="e#6320#6457#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
             <element signature="e#7397#7741#0" />
+            <element signature="e#7836#9243#0" />
           </folding>
         </state>
       </provider>
@@ -226,11 +236,14 @@
           <caret line="11" column="18" lean-forward="true" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#257#890#0" />
             <element signature="e#921#1330#0" />
+            <element signature="e#6320#6457#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
             <element signature="e#7397#7741#0" />
+            <element signature="e#7836#9243#0" />
           </folding>
         </state>
       </provider>
@@ -241,26 +254,49 @@
           <caret line="285" column="12" lean-forward="true" selection-start-line="285" selection-start-column="12" selection-end-line="285" selection-end-column="12" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#257#890#0" />
             <element signature="e#921#1330#0" />
+            <element signature="e#6320#6457#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
             <element signature="e#7397#7741#0" />
+            <element signature="e#7836#9243#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/game_data/visualize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="42">
+          <caret line="2" lean-forward="true" selection-end-line="200" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/game_data/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="84">
+          <caret line="6" lean-forward="true" selection-end-line="176" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/poker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="266" column="27" lean-forward="true" selection-start-line="266" selection-start-column="27" selection-end-line="266" selection-end-column="27" />
+        <state relative-caret-position="347">
+          <caret line="343" column="64" lean-forward="true" selection-start-line="343" selection-start-column="64" selection-end-line="343" selection-end-column="64" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#257#890#0" />
             <element signature="e#921#1330#0" />
+            <element signature="e#6320#6457#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
             <element signature="e#7397#7741#0" />
+            <element signature="e#7836#9243#0" />
           </folding>
         </state>
       </provider>

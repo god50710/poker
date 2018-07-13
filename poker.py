@@ -1,10 +1,10 @@
 # coding=UTF-8
 from pokereval.card import Card
-# from deuces import Card, Evaluator
 from pokereval.hand_evaluator import HandEvaluator
 from websocket import create_connection
 import random
 import json
+from game_data import utils
 
 
 def getCard(card):
@@ -85,11 +85,11 @@ class PokerSocket(object):
         for card in (hands):
             self.hole.append(getCard(card))
 
-        print 'my_Call_Bet:{}'.format(self.my_Call_Bet)
-        print 'my_Raise_Bet:{}'.format(self.my_Raise_Bet)
-        print 'board:{}'.format(self.board)
-        print 'total_bet:{}'.format(self.Table_Bet)
-        print 'hands:{}'.format(self.hole)
+        # print 'my_Call_Bet:{}'.format(self.my_Call_Bet)
+        # print 'my_Raise_Bet:{}'.format(self.my_Raise_Bet)
+        # print 'board:{}'.format(self.board)
+        # print 'total_bet:{}'.format(self.Table_Bet)
+        # print 'hands:{}'.format(self.hole)
 
         if self.board == []:
             round = 'preflop'
@@ -112,13 +112,13 @@ class PokerSocket(object):
             self.board = []
             for card in (boards):
                 self.board.append(getCard(card))
-            print 'number_players:{}'.format(self.number_players)
-            print 'board:{}'.format(self.board)
-            print 'total_bet:{}'.format(self.Table_Bet)
+            # print 'number_players:{}'.format(self.number_players)
+            # print 'board:{}'.format(self.board)
+            # print 'total_bet:{}'.format(self.Table_Bet)
         elif action == "__bet":
             action, amount = self.getAction(data)
-            print "action: {}".format(action)
-            print "action amount: {}".format(amount)
+            # print "action: {}".format(action)
+            # print "action amount: {}".format(amount)
             self.ws.send(json.dumps({
                 "eventName": "__action",
                 "data": {
@@ -132,8 +132,8 @@ class PokerSocket(object):
             for card in (boards):
                 self.board.append(getCard(card))
             action, amount = self.getAction(data)
-            print "action: {}".format(action)
-            print "action amount: {}".format(amount)
+            # print "action: {}".format(action)
+            # print "action amount: {}".format(amount)
             self.ws.send(json.dumps({
                 "eventName": "__action",
                 "data": {
@@ -159,6 +159,12 @@ class PokerSocket(object):
             print "winPlayer:{}".format(isWin)
             print "winChips:{}".format(winChips)
             self.pokerbot.game_over(isWin, winChips, data)
+        elif action == "__game_over":
+            if "training" in connect_url:
+                print "On training server, game over, exit"
+                exit()
+            else:
+                print "On dev server, continue"
 
     def doListen(self):
         try:
@@ -174,8 +180,10 @@ class PokerSocket(object):
                 msg = json.loads(result)
                 event_name = msg["eventName"]
                 data = msg["data"]
-                print event_name
-                print data
+                # print event_name
+                # print data
+                utils.dump_to_json_file(msg)
+                utils.display_msg(msg)
                 self.takeAction(event_name, data)
         except Exception, e:
             print e.message
@@ -244,77 +252,78 @@ class PotOddsPokerBot(PokerBot):
                 win += 1
             round += 1
         # The large rank value means strong hand card
-        print "Win:{}".format(win)
         win_prob = win / float(round)
-        print "win_prob:{}".format(win_prob)
+        print "win_prob:{}".format(win_prob), "Win:{}".format(win)
         return win_prob
 
     def declareAction(self, hole, board, round, my_Raise_Bet, my_Call_Bet, Table_Bet, number_players, raise_count,
                       bet_count, my_Chips, total_bet):
 
-        print "my_Chips", my_Chips, "my_Call_Bet", my_Call_Bet, "my_Raise_Bet", my_Raise_Bet, "Table_Bet", Table_Bet
-        print "Round:{}".format(round)
         score = HandEvaluator.evaluate_hand(hole, board)
-        print "hole", hole, "board", board
         print "score:{}".format(score)
-        allin_static_rate = 0.94
-        raise_static_rate = 0.9
-        call_static_rate = 0.8
+        allin_static_rate = 0.95
+        preflop_raise_static_rate = 0.98
+        preflop_call_static_rate = 0.95
+        flop_raise_static_rate = 0.9
+        flop_call_static_rate = 0.85
         in_montecarlo_rate = 0.69
         in_montecarlo_card = 4
+        if my_Chips + total_bet < 3000:
+            aggressive_by_chip = 3 - (my_Chips + total_bet) / 1000
+        else:
+            aggressive_by_chip = 1
 
         if my_Call_Bet == 0:
             action = 'call'
             amount = my_Call_Bet
-        elif round == 'preflop' or round == 'Deal':
-            if my_Call_Bet > my_Chips:
-                my_Call_Bet = my_Chips
-            ChipOdds = allin_static_rate * ((my_Call_Bet + total_bet) / float(my_Chips + total_bet)) ** 0.5
-            if score >= ChipOdds * 3 and score >= raise_static_rate:
-                action = 'raise'
-                amount = my_Raise_Bet
-            elif score >= ChipOdds * 2 and score >= self.preflop_threshold or score >= call_static_rate:
-                action = 'call'
-                amount = my_Call_Bet
-            else:
-                action = 'fold'
-                amount = 0
-            print "chipodds %s=((%s+%s) /(%s+%s))**0.5, call=%s, raise=%s" % (
-                ChipOdds, my_Call_Bet, total_bet, my_Chips, total_bet, ChipOdds * 2, ChipOdds * 3)
         else:
             if my_Call_Bet > my_Chips:
                 my_Call_Bet = my_Chips
-            ChipOdds = allin_static_rate * ((my_Call_Bet + total_bet) / float(my_Chips + total_bet)) ** 0.5
-            if score >= allin_static_rate and len(board)>=in_montecarlo_card:
-                action = 'allin'
-                amount = 0
-            elif score >= allin_static_rate:
-                action = 'bet'
-                bet = ((my_Chips + total_bet)/3)-total_bet
-                if bet > total_bet:
-                    bet = my_Call_Bet
-                amount = bet
-            elif score >= ChipOdds * 3 and score >= self.flop_threshold or score >= raise_static_rate:
-                action = 'raise'
-                amount = my_Raise_Bet
-            elif score >= ChipOdds * 2 and score >= self.flop_threshold or score >= call_static_rate:
-                action = 'call'
-                amount = my_Call_Bet
+            call_odd = (((my_Call_Bet + total_bet) / float(my_Chips + total_bet)) ** 0.5) ** aggressive_by_chip
+            raise_odd = (call_odd ** 0.5) ** aggressive_by_chip
+
+            if round == 'preflop' or round == 'Deal':
+                if score >= raise_odd and score >= self.preflop_threshold or score >= preflop_raise_static_rate:
+                    action = 'raise'
+                    amount = my_Raise_Bet
+                elif score >= call_odd and score >= self.preflop_threshold or score >= preflop_call_static_rate:
+                    action = 'call'
+                    amount = my_Call_Bet
+                else:
+                    action = 'fold'
+                    amount = 0
             else:
-                action = 'fold'
-                amount = 0
-            print "chipodds %s=((%s+%s) /(%s+%s))**0.5, call>=%s, raise>=%s" % (
-                ChipOdds, my_Call_Bet, total_bet, my_Chips, total_bet, ChipOdds * 2, ChipOdds * 3)
+                call_odd *= allin_static_rate
+                raise_odd *= allin_static_rate
+                if score >= allin_static_rate and len(board) >= in_montecarlo_card:
+                    action = 'allin'
+                    amount = 0
+                elif score >= allin_static_rate:
+                    action = 'bet'
+                    bet = ((my_Chips + total_bet) / 2) - total_bet
+                    if bet <= total_bet:
+                        bet = my_Call_Bet
+                    amount = bet
+                elif score >= raise_odd and score >= self.flop_threshold or score >= flop_raise_static_rate:
+                    action = 'raise'
+                    amount = my_Raise_Bet
+                elif score >= call_odd and score >= self.flop_threshold or score >= flop_call_static_rate:
+                    action = 'call'
+                    amount = my_Call_Bet
+                else:
+                    action = 'fold'
+                    amount = 0
+            print "call=%s, raise=%s, score=%s, action=%s" % (call_odd, raise_odd, score, action)
         if (action == 'call' or action == 'raise') and len(board) >= in_montecarlo_card and score <= in_montecarlo_rate:
             simulation_number = 50
             win_rate = self.get_win_prob(hole, board, simulation_number, number_players)
-            if win_rate < 0.25:
+            if win_rate < 0.20:
                 action = 'fold'
                 amount = 0
-            elif win_rate < 0.30:
+            elif win_rate < 0.25:
                 action = 'call'
                 amount = my_Call_Bet
-            elif win_rate < 0.35:
+            elif win_rate < 0.30:
                 action = 'raise'
                 amount = my_Raise_Bet
             else:
@@ -325,14 +334,14 @@ class PotOddsPokerBot(PokerBot):
 
 
 if __name__ == '__main__':
-    aggresive_threshold = 0.54
+    aggressive_threshold = 0.54
     passive_threshold = 0.7
-    preflop_threshold_Loose = 0.2
-    preflop_threshold_Tight = 0.4
+    preflop_threshold_Loose = 0.4
+    preflop_threshold_Tight = 0.6
 
     playerName = "KIHo"
-    # connect_url = "ws://poker-dev.wrs.club:3001/"
-    connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
-    myPokerBot = PotOddsPokerBot(preflop_threshold_Loose, aggresive_threshold)
+    connect_url = "ws://poker-dev.wrs.club:3001/"
+    # connect_url = "ws://poker-training.vtr.trendnet.org:3001/"
+    myPokerBot = PotOddsPokerBot(preflop_threshold_Loose, aggressive_threshold)
     myPokerSocket = PokerSocket(playerName, connect_url, myPokerBot)
     myPokerSocket.doListen()
