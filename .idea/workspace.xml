@@ -16,10 +16,11 @@
       <file leaf-file-name="poker.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/poker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="302">
-              <caret line="297" column="36" lean-forward="true" selection-start-line="297" selection-start-column="36" selection-end-line="297" selection-end-column="36" />
+            <state relative-caret-position="106">
+              <caret line="266" column="27" lean-forward="true" selection-start-line="266" selection-start-column="27" selection-end-line="266" selection-end-column="27" />
               <folding>
                 <element signature="e#15#46#0" expanded="true" />
+                <element signature="e#921#1330#0" />
                 <element signature="e#6616#6633#0" />
                 <element signature="e#6674#6856#0" />
                 <element signature="e#6903#7333#0" />
@@ -81,9 +82,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="8" />
-    <option name="width" value="838" />
-    <option name="height" value="1002" />
+    <option name="x" value="-1870" />
+    <option name="y" value="10" />
+    <option name="width" value="1918" />
+    <option name="height" value="1038" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -160,13 +162,13 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="8" width="838" height="1002" extended-state="0" />
+    <frame x="-1870" y="10" width="1918" height="1038" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17396593" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.07518402" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5005952" side_tool="true" weight="0.38157895" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49940476" visible="true" weight="0.5546787" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49940476" visible="true" weight="0.24377032" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -187,7 +189,19 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/poker.py</url>
+          <line>4</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/poker.py</url>
+          <line>42</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="3" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -197,6 +211,7 @@
           <caret line="336" column="32" lean-forward="true" selection-start-line="336" selection-start-column="32" selection-end-line="336" selection-end-column="32" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#921#1330#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
@@ -211,6 +226,7 @@
           <caret line="11" column="18" lean-forward="true" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#921#1330#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
@@ -225,6 +241,7 @@
           <caret line="285" column="12" lean-forward="true" selection-start-line="285" selection-start-column="12" selection-end-line="285" selection-end-column="12" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#921#1330#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
@@ -235,10 +252,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/poker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="302">
-          <caret line="297" column="36" lean-forward="true" selection-start-line="297" selection-start-column="36" selection-end-line="297" selection-end-column="36" />
+        <state relative-caret-position="106">
+          <caret line="266" column="27" lean-forward="true" selection-start-line="266" selection-start-column="27" selection-end-line="266" selection-end-column="27" />
           <folding>
             <element signature="e#15#46#0" expanded="true" />
+            <element signature="e#921#1330#0" />
             <element signature="e#6616#6633#0" />
             <element signature="e#6674#6856#0" />
             <element signature="e#6903#7333#0" />
